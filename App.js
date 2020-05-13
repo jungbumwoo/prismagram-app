@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from "@expo/vector-icons";
-import { Apploading, Font } from "expo";
-import { Text, View, AsyncStorage } from 'react-native';
+import { Apploading } from "expo";
+import { Asset } from "expo-asset";
+import * Font from "expo-font";
+import { AsyncStorage } from "react-native";
 import { InmemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
 import ApolloClient from "apollo-boost";
+import { ThemeProvider } from "styled-components";
 import { ApolloProvider } from "react-apollo-hooks";
 import ApolloClientOptions from "./apollo";
+import styles from "./styles";
+import NavController from "./component/NavController";
+import { AuthProvider } from "./AuthContext";
 
 
 export default function App() {
   const [ loaded, setLoaded ] = useState(false);
   const [ client, setClient ] = useState(null);
+  const [ isLoggedIn, setIsLoggedIn ] = useState(null);
   const preload = async() => {
     try {
       await Font.loadAsync({
@@ -26,7 +33,13 @@ export default function App() {
       const client = new ApolloClient({
         cache,
         ...ApolloClientOptions
-      });
+      }); 
+      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+      if (!isLoggedIn || isLoggedIn === "false") {
+        setIsLoggedIn(false);
+      } else {
+        setIsLoggedIn(true);
+      }
       setLoaded(true);
       setClient(client);
     } catch(e) {
@@ -36,11 +49,14 @@ export default function App() {
   useEffect(() => {
     preload()
   }, []);
-  return loaded && client ? (
+
+  return loaded && client && isLoggedIn !== null ? (
     <ApolloProvider client={client}>
-      <View>
-        <Text>ㅁㄴㅇㄻㅇㄻㄴㅇㄻㄴㅇㄻ</Text>
-      </View>
+      <ThemeProvider theme={styles}>
+        <AuthProvider isLoggedIn={isLoggedIn}>
+          <NavController />
+        </AuthProvider>
+      </ThemeProvider>
     </ApolloProvider>
   ) : (
     <Apploading />
