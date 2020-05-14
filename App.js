@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Ionicons } from "@expo/vector-icons";
 import { Apploading } from "expo";
 import { Asset } from "expo-asset";
-import * Font from "expo-font";
+import * as Font from "expo-font";
 import { AsyncStorage } from "react-native";
 import { InmemoryCache } from "apollo-cache-inmemory";
 import { persistCache } from "apollo-cache-persist";
